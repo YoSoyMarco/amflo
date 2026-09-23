@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para Amayrani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Tokens: claro = amanecer, oscuro = noche ---------- */
+  :root{
+    color-scheme: light;
+    --bg1:#fbe9f3;
+    --bg2:#dbe3ff;
+    --glow:rgba(255,206,90,.65);
+    --ink:#43285f;
+    --name:#b06a00;
+    --nameglow:none;
+    --pollen:#e9a400;
+    --shadow:rgba(75,45,111,.30);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg1:#120e30;
+      --bg2:#4b2a70;
+      --glow:rgba(255,196,60,.32);
+      --ink:#f6e9ff;
+      --name:#ffd049;
+      --nameglow:0 0 26px rgba(246,194,42,.38);
+      --pollen:#ffd54f;
+      --shadow:rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg1:#120e30;
+    --bg2:#4b2a70;
+    --glow:rgba(255,196,60,.32);
+    --ink:#f6e9ff;
+    --name:#ffd049;
+    --nameglow:0 0 26px rgba(246,194,42,.38);
+    --pollen:#ffd54f;
+    --shadow:rgba(0,0,0,.45);
+  }
+
+  html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+  *,*::before,*::after{box-sizing:inherit}
+  body{
+    margin:0;
+    min-height:100%;
+    display:grid;
+    place-items:center;
+    overflow-x:clip;
+    background-color:var(--bg2);
+    background-image:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  main{
+    position:relative;
+    z-index:1;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:clamp(.5rem,2.5vh,1.5rem);
+    padding:clamp(1rem,3vh,2rem) 1.25rem;
+  }
+
+  /* ---------- Escenario del ramo ---------- */
+  .stage{
+    position:relative;
+    isolation:isolate;
+    display:block;
+    margin:0;
+    padding:0;
+    border:0;
+    background:none;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .stage::before{
+    content:"";
+    position:absolute;
+    inset:-12% -22% -2%;
+    z-index:-1;
+    pointer-events:none;
+    background:radial-gradient(closest-side,var(--glow),transparent 74%);
+  }
+  .stage:focus-visible{outline:2px solid var(--name);outline-offset:10px;border-radius:18px}
+  .stage svg{
+    display:block;
+    overflow:visible;
+    width:min(90vw,440px);
+    width:min(90vw,440px,calc(56svh * .7692));
+    height:auto;
+    filter:drop-shadow(0 16px 22px var(--shadow));
+  }
+
+  /* ---------- Mensaje ---------- */
+  .message{
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    text-wrap:balance;
+    max-width:26rem;
+  }
+  .l1,.l2{
+    font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(1.2rem,4.2vw,1.65rem);
+    line-height:1.5;
+  }
+  .name{
+    font-family:"Pinyon Script","Snell Roundhand","Segoe Script","Brush Script MT",cursive;
+    font-weight:400;
+    font-size:clamp(3.4rem,15vw,5.4rem);
+    line-height:1.1;
+    color:var(--name);
+    text-shadow:var(--nameglow);
+  }
+  .message span{display:block;animation:say 1.2s ease-out both}
+  .l1{animation-delay:2.4s}
+  .l2{animation-delay:2.9s}
+  .name{animation-delay:3.5s}
+  @keyframes say{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* Pantallas anchas: ramo a la izquierda, mensaje a la derecha */
+  @media (min-width:860px) and (min-aspect-ratio:5/4){
+    main{flex-direction:row;justify-content:center;gap:clamp(2rem,7vw,6rem)}
+    .stage svg{
+      width:min(46vw,64vh);
+      width:min(46vw,calc(84svh * .7692));
+    }
+    .message{align-items:flex-start;text-align:left}
+  }
+
+  /* ---------- Movimiento del ramo ---------- */
+  #bunch{transform-box:view-box;transform-origin:200px 440px}
+
+  .sway{
+    transform-box:view-box;
+    transform-origin:200px 440px;
+    animation:sway var(--dur,7s) ease-in-out infinite alternate;
+    animation-delay:var(--del,0s);
+  }
+  @keyframes sway{
+    from{transform:rotate(calc(var(--a,1.6deg) * -1))}
+    to{transform:rotate(var(--a,1.6deg))}
+  }
+
+  .stem{
+    fill:none;
+    stroke:#2f6a3a;
+    stroke-linecap:round;
+    stroke-dasharray:1;
+    animation:grow 1.3s ease-out both;
+    animation-delay:calc(.15s + var(--i,0) * .09s);
+  }
+  .stem.hi{stroke:#8ccb72;stroke-opacity:.55;transform:translate(-.9px,0)}
+  @keyframes grow{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+
+  .leaf{
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:unfurl 1s ease-out both;
+    animation-delay:calc(.5s + var(--i,0) * .1s);
+  }
+  @keyframes unfurl{from{transform:scale(0);opacity:0}to{transform:none;opacity:1}}
+
+  .bloom{
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:bloom 1.5s cubic-bezier(.2,1.25,.4,1) both;
+    animation-delay:calc(.6s + var(--i,0) * .11s);
+  }
+  @keyframes bloom{
+    from{transform:scale(0) rotate(-45deg);opacity:0}
+    55%{opacity:1}
+    to{transform:none;opacity:1}
+  }
+  .wob{
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:wob var(--wt,7s) ease-in-out infinite alternate;
+    animation-delay:var(--wd,0s);
+  }
+  @keyframes wob{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+
+  .tail{
+    transform-box:fill-box;
+    transform-origin:50% 0;
+    animation:tail 5s ease-in-out infinite alternate;
+  }
+  .tail.tr{animation-delay:-2.2s}
+  @keyframes tail{from{transform:rotate(-2.6deg)}to{transform:rotate(2.6deg)}}
+
+  /* ---------- Polen ambiental ---------- */
+  .pollen{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .pollen i{
+    position:absolute;
+    left:var(--x);
+    bottom:-12px;
+    width:var(--s);
+    height:var(--s);
+    border-radius:50%;
+    background:var(--pollen);
+    opacity:0;
+    animation:rise var(--t) linear infinite;
+    animation-delay:var(--d);
+  }
+  @keyframes rise{
+    0%{transform:translate3d(0,0,0);opacity:0}
+    12%{opacity:.75}
+    88%{opacity:.55}
+    100%{transform:translate3d(var(--dx),-108vh,0);opacity:0}
+  }
+
+  /* ---------- Pétalos al tocar ---------- */
+  .petal{
+    position:fixed;
+    left:0;top:0;
+    z-index:5;
+    width:11px;height:17px;
+    border-radius:60% 0 60% 0;
+    background:linear-gradient(135deg,#ffe27a,#f0a512);
+    pointer-events:none;
+    animation:fall var(--t) cubic-bezier(.2,.6,.4,1) forwards;
+  }
+  @keyframes fall{
+    from{transform:translate(var(--x),var(--y)) rotate(0deg);opacity:1}
+    to{transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) rotate(var(--r));opacity:0}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important}
+    .pollen{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="pollen" id="pollen" aria-hidden="true"></div>
+
+<main>
+  <button class="stage" id="stage" type="button" aria-label="Ramo de flores amarillas. Tócalo para que caigan pétalos.">
+    <svg viewBox="0 0 400 520" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="gBack" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#d4780a"/><stop offset=".55" stop-color="#f0a414"/><stop offset="1" stop-color="#ffd54f"/>
+        </linearGradient>
+        <linearGradient id="gFront" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#ec9a0c"/><stop offset=".5" stop-color="#ffc826"/><stop offset="1" stop-color="#ffe98a"/>
+        </linearGradient>
+        <linearGradient id="gDaisy" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#f4b00a"/><stop offset="1" stop-color="#fff2a6"/>
+        </linearGradient>
+        <radialGradient id="gSeed" cx=".4" cy=".38" r=".75">
+          <stop offset="0" stop-color="#8a5722"/><stop offset=".55" stop-color="#4d2c11"/><stop offset="1" stop-color="#2a1608"/>
+        </radialGradient>
+        <radialGradient id="gDaisyC" cx=".4" cy=".35" r=".8">
+          <stop offset="0" stop-color="#ffd23c"/><stop offset="1" stop-color="#e58a00"/>
+        </radialGradient>
+        <radialGradient id="gPuff" cx=".4" cy=".35" r=".7">
+          <stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#f5c21b"/>
+        </radialGradient>
+        <linearGradient id="gTulipF" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#f2ac10"/><stop offset="1" stop-color="#ffe36a"/>
+        </linearGradient>
+        <linearGradient id="gTulipB" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#dd8f08"/><stop offset="1" stop-color="#f7c531"/>
+        </linearGradient>
+        <linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#6aa95b"/><stop offset="1" stop-color="#2e6538"/>
+        </linearGradient>
+        <linearGradient id="gPaperBack" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e59ab9"/><stop offset="1" stop-color="#c97ea0"/>
+        </linearGradient>
+        <linearGradient id="gPaperL" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fcdce9"/><stop offset="1" stop-color="#efb0cb"/>
+        </linearGradient>
+        <linearGradient id="gPaperR" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f7c8dc"/><stop offset="1" stop-color="#e59ab9"/>
+        </linearGradient>
+        <linearGradient id="gRibbon" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#f2d9a0"/>
+        </linearGradient>
+        <clipPath id="paperClip">
+          <path d="M70 322Q135 345 200 338Q265 345 330 322L238 498Q200 512 162 498Z"/>
+        </clipPath>
+      </defs>
+
+      <!-- Papel: parte trasera -->
+      <g>
+        <path d="M70 322Q135 345 200 338Q265 345 330 322L238 498Q200 512 162 498Z" fill="url(#gPaperBack)"/>
+        <path d="M70 322Q135 345 200 338Q265 345 330 322" fill="none" stroke="#fff5d9" stroke-opacity=".6" stroke-width="1.4"/>
+      </g>
+
+      <!-- Flores y hojas (se generan con JS) -->
+      <g id="bunch"></g>
+
+      <!-- Papel: solapas frontales -->
+      <g>
+        <path d="M70 322Q132 348 200 386L200 508Q180 508 162 498Z" fill="url(#gPaperL)"/>
+        <path d="M330 322Q268 348 200 386L200 508Q220 508 238 498Z" fill="url(#gPaperR)"/>
+        <path d="M112 352L182 492" stroke="#fff" stroke-opacity=".28" stroke-width="1" fill="none"/>
+        <path d="M288 352L218 492" stroke="#fff" stroke-opacity=".22" stroke-width="1" fill="none"/>
+        <path d="M200 386L200 508" stroke="#8a3a66" stroke-opacity=".2" stroke-width="1" fill="none"/>
+        <path d="M70 322Q132 348 200 386" fill="none" stroke="#fff5d9" stroke-opacity=".9" stroke-width="1.6"/>
+        <path d="M330 322Q268 348 200 386" fill="none" stroke="#fff5d9" stroke-opacity=".9" stroke-width="1.6"/>
+        <!-- Cinta alrededor del ramo -->
+        <g clip-path="url(#paperClip)">
+          <path d="M90 366Q200 404 310 366L306 392Q200 430 94 392Z" fill="url(#gRibbon)" stroke="#d9b56a" stroke-width=".8"/>
+        </g>
+      </g>
+
+      <!-- Moño -->
+      <g>
+        <path class="tail tl" d="M197 405L168 474L184 467L190 486L208 412Z" fill="url(#gRibbon)" stroke="#d9b56a" stroke-width=".8" stroke-linejoin="round"/>
+        <path class="tail tr" d="M203 405L232 474L216 467L210 486L192 412Z" fill="url(#gRibbon)" stroke="#d9b56a" stroke-width=".8" stroke-linejoin="round"/>
+        <path d="M200 398C164 358 112 382 148 412C166 424 192 412 200 398Z" fill="url(#gRibbon)" stroke="#d9b56a" stroke-width=".8" stroke-linejoin="round"/>
+        <path d="M200 398C236 358 288 382 252 412C234 424 208 412 200 398Z" fill="url(#gRibbon)" stroke="#d9b56a" stroke-width=".8" stroke-linejoin="round"/>
+        <path d="M152 398C166 390 182 394 195 399" fill="none" stroke="#d9b56a" stroke-opacity=".55" stroke-width=".8"/>
+        <path d="M248 398C234 390 218 394 205 399" fill="none" stroke="#d9b56a" stroke-opacity=".55" stroke-width=".8"/>
+        <rect x="188" y="387" width="24" height="24" rx="9" fill="url(#gRibbon)" stroke="#d9b56a" stroke-width=".8"/>
+      </g>
+    </svg>
+  </button>
+
+  <p class="message">
+    <span class="l1">Con mucho cariño, de Marco, para:</span>
+    <span class="l2">Amayrani.</span>
+  </p>
+</main>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const f = n => Math.round(n * 100) / 100;
+
+  // Generador pseudoaleatorio con semilla: el ramo siempre queda igual
+  const rng = seed => () => {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const rand = rng(21);
+
+  /* ---------- Formas ---------- */
+  const pointed = (L, W) =>
+    `M0 0C${W} ${-L*.2} ${W*.9} ${-L*.8} 0 ${-L}C${-W*.9} ${-L*.8} ${-W} ${-L*.2} 0 0Z` +
+    `M0 ${-L*.14}L0 ${-L*.72}`;
+  const rounded = (L, W) =>
+    `M0 0C${W*1.1} ${-L*.1} ${W*1.25} ${-L*.85} ${W*.3} ${-L*.99}Q0 ${-L*1.05} ${-W*.3} ${-L*.99}` +
+    `C${-W*1.25} ${-L*.85} ${-W*1.1} ${-L*.1} 0 0Z M0 ${-L*.14}L0 ${-L*.7}`;
+  const petalStyle = (fill, edge) => ({
+    fill, stroke: edge, 'stroke-opacity': .45, 'stroke-width': .6, 'stroke-linejoin': 'round'
+  });
+
+  function sunflower(g) {
+    const n = 18;
+    for (let i = 0; i < n; i++)
+      el('path', { d: pointed(47, 10), ...petalStyle('url(#gBack)', '#b96a06'),
+        transform: `rotate(${f(i * 360 / n + (rand() - .5) * 5)})` }, g);
+    for (let i = 0; i < n; i++)
+      el('path', { d: pointed(42, 11.5), ...petalStyle('url(#gFront)', '#b96a06'),
+        transform: `rotate(${f(i * 360 / n + 180 / n + (rand() - .5) * 5)})` }, g);
+    el('circle', { r: 22.5, fill: '#7a3f05', 'fill-opacity': .38 }, g);
+    el('circle', { r: 20, fill: 'url(#gSeed)' }, g);
+    const ga = Math.PI * (3 - Math.sqrt(5)); // ángulo áureo: espiral de semillas
+    for (let k = 1; k <= 130; k++) {
+      const r = 1.6 * Math.sqrt(k), a = k * ga;
+      el('circle', {
+        cx: f(r * Math.cos(a)), cy: f(r * Math.sin(a)), r: f(.55 + r * .045),
+        fill: k % 3 ? '#c9902f' : '#e9bd62',
+        'fill-opacity': f(.5 + Math.min(.4, r / 46))
+      }, g);
+    }
+    el('circle', { r: 19.5, fill: 'none', stroke: '#e2a93a', 'stroke-width': 1.6,
+      'stroke-dasharray': '1 2.4', 'stroke-opacity': .7 }, g);
+  }
+
+  function daisy(g) {
+    const n = 15;
+    for (let i = 0; i < n; i++)
+      el('path', { d: rounded(33, 8), ...petalStyle('url(#gDaisy)', '#c98209'),
+        transform: `rotate(${f(i * 360 / n)})` }, g);
+    for (let i = 0; i < n; i++)
+      el('path', { d: rounded(27, 8.5), ...petalStyle('url(#gFront)', '#c98209'),
+        transform: `rotate(${f(i * 360 / n + 180 / n)})` }, g);
+    el('circle', { r: 10.5, fill: 'url(#gDaisyC)', stroke: '#c77800', 'stroke-opacity': .5, 'stroke-width': .8 }, g);
+    const ga = Math.PI * (3 - Math.sqrt(5));
+    for (let k = 1; k <= 26; k++) {
+      const r = 1.75 * Math.sqrt(k), a = k * ga;
+      el('circle', { cx: f(r * Math.cos(a)), cy: f(r * Math.sin(a)), r: .7, fill: '#b86a00', 'fill-opacity': .55 }, g);
+    }
+    el('circle', { cx: -2.6, cy: -3.2, r: 3, fill: '#fff', 'fill-opacity': .18 }, g);
+  }
+
+  function tulip(g) {
+    const t = el('g', { transform: 'translate(0 -6)' }, g);
+    const edge = { stroke: '#b96a06', 'stroke-opacity': .45, 'stroke-width': .7, 'stroke-linejoin': 'round' };
+    el('path', { d: 'M-2 24C-24 22-26 -4-15 -24C-7 -15-2 -2-2 24Z', fill: 'url(#gTulipB)', ...edge }, t);
+    el('path', { d: 'M2 24C24 22 26 -4 15 -24C7 -15 2 -2 2 24Z', fill: 'url(#gTulipB)', ...edge }, t);
+    el('path', { d: 'M0 -30C12 -20 22 -4 18 10C14 24 -14 24 -18 10C-22 -4 -12 -20 0 -30Z', fill: 'url(#gTulipF)', ...edge }, t);
+    el('path', { d: 'M0 -22C3 -8 3 8 0 22', fill: 'none', stroke: '#c98209', 'stroke-opacity': .4, 'stroke-width': .8 }, t);
+    el('path', { d: 'M-8 21Q0 29 8 21Q0 25 -8 21Z', fill: '#4a8a4a' }, t);
+  }
+
+  function mimosa(g) {
+    const puffs = [[0,0,10],[-14,-7,8.5],[13,-9,9],[-3,-19,8],[-17,8,8],[15,8,8.5],[2,13,7.5]];
+    puffs.forEach(([x, y, r]) => {
+      const p = el('g', { transform: `translate(${x} ${y})` }, g);
+      el('circle', { r, fill: 'url(#gPuff)' }, p);
+      for (let k = 0; k < 16; k++) {
+        const a = rand() * Math.PI * 2, d = Math.sqrt(rand()) * r * .95;
+        el('circle', { cx: f(Math.cos(a) * d), cy: f(Math.sin(a) * d), r: f(1 + rand() * 1.1),
+          fill: rand() > .35 ? '#fff3a8' : '#e7a90f', 'fill-opacity': .85 }, p);
+      }
+    });
+  }
+
+  function leaf(parent, x1, y1, x2, y2, w, idx) {
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+    const nx = -dy / len * w, ny = dx / len * w;
+    const g = el('g', { class: 'leaf', style: `--i:${idx}` }, parent);
+    el('path', {
+      d: `M${f(x1)} ${f(y1)}Q${f(mx + nx)} ${f(my + ny)} ${f(x2)} ${f(y2)}Q${f(mx - nx)} ${f(my - ny)} ${f(x1)} ${f(y1)}Z`,
+      fill: 'url(#gLeaf)', stroke: '#2a5a34', 'stroke-opacity': .6, 'stroke-width': .6, 'stroke-linejoin': 'round'
+    }, g);
+    el('path', { d: `M${f(x1)} ${f(y1)}L${f(x2)} ${f(y2)}`, fill: 'none', stroke: '#b6de99', 'stroke-opacity': .55, 'stroke-width': .8 }, g);
+  }
+
+  const swayGroup = (parent, amp, dur, del) =>
+    el('g', { class: 'sway', style: `--a:${amp}deg;--dur:${dur}s;--del:${del}s` }, parent);
+
+  /* ---------- Composición ---------- */
+  const bunch = document.getElementById('bunch');
+  const BASE = { x: 200, y: 440 };
+
+  // Hojas largas al fondo
+  [[26,236],[374,240],[60,150],[342,146],[112,86],[292,84]].forEach(([tx, ty], i) => {
+    const g = swayGroup(bunch, f(.9 + rand() * 1.2), f(6 + rand() * 3), -f(rand() * 6));
+    const len = Math.hypot(tx - BASE.x, ty - BASE.y);
+    leaf(g, BASE.x, BASE.y, tx, ty, len * .085, i);
+  });
+
+  // Orden de atrás hacia adelante
+  const flowers = [
+    { t: 'mimosa', x: 34,  y: 222, s: 1,    r: 0 },
+    { t: 'mimosa', x: 368, y: 214, s: 1,    r: 0 },
+    { t: 'mimosa', x: 168, y: 52,  s: .95,  r: 0 },
+    { t: 'mimosa', x: 238, y: 44,  s: 1,    r: 0 },
+    { t: 'tulip',  x: 128, y: 112, s: 1,    r: -14 },
+    { t: 'tulip',  x: 276, y: 108, s: 1,    r: 13 },
+    { t: 'sun',    x: 200, y: 150, s: 1.1,  r: 0 },
+    { t: 'sun',    x: 106, y: 204, s: .95,  r: -8 },
+    { t: 'sun',    x: 296, y: 210, s: 1,    r: 9 },
+    { t: 'daisy',  x: 56,  y: 292, s: .95,  r: -12 },
+    { t: 'daisy',  x: 346, y: 298, s: .95,  r: 12 },
+    { t: 'daisy',  x: 146, y: 305, s: .8,   r: -6 },
+    { t: 'daisy',  x: 258, y: 312, s: .8,   r: 6 },
+    { t: 'daisy',  x: 200, y: 262, s: .9,   r: 0 }
+  ];
+  const draw = { sun: sunflower, daisy, tulip, mimosa };
+  const attach = { sun: 0, daisy: 0, tulip: 17, mimosa: 0 };
+
+  // Las flores florecen empezando por el girasol central
+  const dist = s => Math.hypot(s.x - 200, s.y - 150);
+  const rank = flowers.map((s, i) => [i, dist(s)]).sort((a, b) => a[1] - b[1])
+    .reduce((acc, [i], pos) => (acc[i] = pos, acc), []);
+
+  flowers.forEach((s, i) => {
+    const idx = rank[i];
+    const amp = f(1.1 + rand() * 1.6), dur = f(5.2 + rand() * 3), del = -f(rand() * dur);
+    const g = swayGroup(bunch, amp, dur, del);
+
+    // Tallo
+    const rad = s.r * Math.PI / 180, ad = attach[s.t] * s.s;
+    const E = { x: s.x - ad * Math.sin(rad), y: s.y + ad * Math.cos(rad) };
+    const S = { x: BASE.x + (E.x - BASE.x) * .05, y: BASE.y };
+    const C = { x: S.x + (E.x - S.x) * .12, y: S.y + (E.y - S.y) * .55 };
+    const d = `M${f(S.x)} ${S.y}Q${f(C.x)} ${f(C.y)} ${f(E.x)} ${f(E.y)}`;
+    const sw = s.t === 'mimosa' ? 2.4 : 3.6;
+    el('path', { d, pathLength: 1, class: 'stem', 'stroke-width': sw, style: `--i:${idx}` }, g);
+    el('path', { d, pathLength: 1, class: 'stem hi', 'stroke-width': f(sw * .3), style: `--i:${idx}` }, g);
+
+    // Hojas sobre el tallo
+    if (s.t !== 'mimosa') {
+      [.5, .72].forEach((t, j) => {
+        const u = 1 - t;
+        const px = u*u*S.x + 2*t*u*C.x + t*t*E.x, py = u*u*S.y + 2*t*u*C.y + t*t*E.y;
+        let tx = 2*u*(C.x - S.x) + 2*t*(E.x - C.x), ty = 2*u*(C.y - S.y) + 2*t*(E.y - C.y);
+        const tl = Math.hypot(tx, ty); tx /= tl; ty /= tl;
+        const side = (i + j) % 2 ? 1 : -1, a = side * 58 * Math.PI / 180;
+        const dx = tx * Math.cos(a) - ty * Math.sin(a), dy = tx * Math.sin(a) + ty * Math.cos(a);
+        const len = (26 + rand() * 12) * s.s;
+        leaf(g, px, py, px + dx * len, py + dy * len, len * .2, idx + j * 2);
+      });
+    }
+
+    // Cabeza de la flor
+    const outer = el('g', { transform: `translate(${s.x} ${s.y}) rotate(${s.r}) scale(${s.s})` }, g);
+    const bloom = el('g', { class: 'bloom', style: `--i:${idx}` }, outer);
+    const wob = el('g', { class: 'wob', style: `--wt:${f(5 + rand() * 4)}s;--wd:-${f(rand() * 6)}s` }, bloom);
+    draw[s.t](wob);
+  });
+
+  /* ---------- Polen ambiental ---------- */
+  const pollen = document.getElementById('pollen');
+  if (!reduce) {
+    for (let i = 0; i < 22; i++) {
+      const p = document.createElement('i');
+      const t = 14 + Math.random() * 12;
+      p.style.cssText =
+        `--x:${(Math.random() * 100).toFixed(1)}%;--s:${(3 + Math.random() * 3).toFixed(1)}px;` +
+        `--t:${t.toFixed(1)}s;--d:-${(Math.random() * t).toFixed(1)}s;--dx:${(Math.random() * 120 - 60).toFixed(0)}px`;
+      pollen.appendChild(p);
+    }
+  }
+
+  /* ---------- Interacción: soplo de viento y pétalos ---------- */
+  const stage = document.getElementById('stage');
+  const colors = ['#ffe27a', '#ffd23c', '#f7b90a', '#fff0a0'];
+  stage.addEventListener('click', e => {
+    if (reduce) return;
+    const r = stage.getBoundingClientRect();
+    const px = e.detail === 0 ? r.left + r.width / 2 : e.clientX;
+    const py = e.detail === 0 ? r.top + r.height * .3 : e.clientY;
+
+    if (bunch.animate) {
+      bunch.animate([
+        { transform: 'rotate(0deg)' },
+        { transform: 'rotate(-2.4deg)', offset: .3 },
+        { transform: 'rotate(1.8deg)', offset: .65 },
+        { transform: 'rotate(0deg)' }
+      ], { duration: 1500, easing: 'ease-in-out' });
+    }
+
+    for (let i = 0; i < 18; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      const t = 1.8 + Math.random() * 1.6;
+      petal.style.cssText =
+        `--x:${px.toFixed(0)}px;--y:${py.toFixed(0)}px;` +
+        `--dx:${(Math.random() * 220 - 110).toFixed(0)}px;--dy:${(140 + Math.random() * 240).toFixed(0)}px;` +
+        `--r:${(Math.random() * 720 - 360).toFixed(0)}deg;--t:${t.toFixed(2)}s;` +
+        `background:linear-gradient(135deg,${colors[i % colors.length]},#f0a512)`;
+      petal.addEventListener('animationend', () => petal.remove());
+      document.body.appendChild(petal);
+    }
+  });
+})();
+</script>
+</body>
+</html>
